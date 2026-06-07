@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Streamlit local state
+.streamlit/secrets.toml
+
+# Logs
+*.log
+
+# Large local datasets and model binaries
+**/data/raw/*
+!**/data/raw/.gitkeep
+*.keras
+*.h5
+*.pkl
+*.joblib
+
+# Generated reports can be rebuilt
+**/reports/figures/*
+!**/reports/figures/.gitkeep

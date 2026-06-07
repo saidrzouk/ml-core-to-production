@@ -1,0 +1,8 @@
+__pycache__/
+.ipynb_checkpoints/
+.streamlit/
+*.pyc
+*.pyo
+
+# Large raw data files stay local
+data/*.csv
