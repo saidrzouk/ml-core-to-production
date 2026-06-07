@@ -1,5 +1,10 @@
 from datetime import timedelta
+import sys
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
+
 import joblib
 import numpy as np
 import pandas as pd
@@ -8,15 +13,14 @@ import streamlit as st
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from tensorflow.keras.models import load_model
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DATA_PATH = PROJECT_DIR / "data" / "raw" / "AEP_hourly.csv"
-MODEL_DIR = PROJECT_DIR / "models"
-PROPHET_MODEL_PATH = MODEL_DIR / "prophet_model.pkl"
-LSTM_MODEL_PATH = MODEL_DIR / "lstm_model.keras"
-SCALER_PATH = MODEL_DIR / "scaler.pkl"
-
-WINDOW = 30
-DEFAULT_HORIZON_OPTIONS = (30, 60, 90, 180)
+from src.config import (
+    DATA_PATH,
+    PROPHET_MODEL_PATH,
+    LSTM_MODEL_PATH,
+    SCALER_PATH,
+    WINDOW,
+    DEFAULT_HORIZON_OPTIONS,
+)
 
 
 st.set_page_config(page_title="Energy Demand Forecaster", page_icon="⚡", layout="wide")

@@ -1,16 +1,16 @@
+import sys
 from pathlib import Path
 import json
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 import numpy as np
 import streamlit as st
 import tensorflow as tf
 from tensorflow.keras.utils import img_to_array, load_img
 
-
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-MODEL_PATH = PROJECT_DIR / "models" / "flower_classifier_model.keras"
-CLASS_NAMES_PATH = PROJECT_DIR / "models" / "class_names.json"
-IMG_SIZE = (224, 224)
+from src.config import CLASS_NAMES_PATH, IMG_SIZE, MODEL_PATH
 
 
 @st.cache_resource

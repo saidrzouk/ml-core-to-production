@@ -1,21 +1,24 @@
+import sys
 from pathlib import Path
 import json
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
-
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DATA_DIR = PROJECT_DIR / "data" / "raw" / "flowers"
-MODEL_PATH = PROJECT_DIR / "models" / "flower_classifier_model.keras"
-CLASS_NAMES_PATH = PROJECT_DIR / "models" / "class_names.json"
-
-IMG_SIZE = (224, 224)
-BATCH_SIZE = 32
-SEED = 42
-EPOCHS = 10
-FINE_TUNE_EPOCHS = 5
+from src.config import (
+    BATCH_SIZE,
+    CLASS_NAMES_PATH,
+    DATA_DIR,
+    EPOCHS,
+    FINE_TUNE_EPOCHS,
+    IMG_SIZE,
+    MODEL_PATH,
+    SEED,
+)
 
 
 def load_datasets():

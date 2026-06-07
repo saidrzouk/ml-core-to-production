@@ -1,6 +1,16 @@
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
+
 import streamlit as st
 
-from src.recommender import ARTIFACT_PATH, load_artifact, recommend_similar_books
+from src.recommender import (
+    ARTIFACT_PATH,
+    load_artifact,
+    recommend_similar_books,
+)
 
 
 def format_year(value):

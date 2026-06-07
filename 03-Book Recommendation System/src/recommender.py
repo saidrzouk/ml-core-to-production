@@ -1,15 +1,67 @@
-from pathlib import Path
-
 import joblib
 import pandas as pd
 from scipy.sparse import csr_matrix
 from sklearn.neighbors import NearestNeighbors
 
+from src.config import ARTIFACT_PATH, DATA_DIR
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DATA_DIR = PROJECT_DIR / "data"
-ARTIFACT_DIR = PROJECT_DIR / "artifacts"
-ARTIFACT_PATH = ARTIFACT_DIR / "book_recommendation_artifact.joblib"
+BOOK_COLUMNS = [
+    "ISBN",
+    "bookTitle",
+    "bookAuthor",
+    "yearOfPublication",
+    "publisher",
+    "imageUrlS",
+    "imageUrlM",
+    "imageUrlL",
+]
+USER_COLUMNS = ["userID", "location", "age"]
+RATING_COLUMNS = ["userID", "ISBN", "bookRating"]
+
+
+def assert_columns(df, required_columns, name):
+    missing = [column for column in required_columns if column not in df.columns]
+    if missing:
+        raise ValueError(f"{name} is missing columns: {missing}")
+
+
+def assert_non_empty(df, name):
+    if df.empty:
+        raise ValueError(f"{name} is empty after validation and filtering")
+
+
+def validate_artifact(artifact):
+    required_keys = {
+        "model",
+        "book_matrix",
+        "book_titles",
+        "book_info",
+        "book_stats",
+        "filtered_counts",
+    }
+    missing = required_keys - set(artifact)
+    if missing:
+        raise ValueError(f"Artifact is missing keys: {sorted(missing)}")
+
+    assert_columns(
+        artifact["book_info"],
+        ["bookTitle", "bookAuthor", "publisher", "yearOfPublication", "averageRating", "numberOfRatings", "imageUrlM"],
+        "artifact['book_info']",
+    )
+    assert_columns(
+        artifact["book_stats"],
+        ["bookTitle", "averageRating", "numberOfRatings", "popularityScore"],
+        "artifact['book_stats']",
+    )
+
+    if not isinstance(artifact["book_titles"], list) or not artifact["book_titles"]:
+        raise ValueError("artifact['book_titles'] must be a non-empty list")
+    if "users" not in artifact["filtered_counts"]:
+        raise ValueError("artifact['filtered_counts'] must include 'users'")
+    if "books" not in artifact["filtered_counts"]:
+        raise ValueError("artifact['filtered_counts'] must include 'books'")
+    if "ratings" not in artifact["filtered_counts"]:
+        raise ValueError("artifact['filtered_counts'] must include 'ratings'")
 
 
 def load_data():
@@ -20,31 +72,38 @@ def load_data():
         on_bad_lines="skip",
         low_memory=False,
     )
+    if books.shape[1] != len(BOOK_COLUMNS):
+        raise ValueError(
+            f"BX_Books.csv must have {len(BOOK_COLUMNS)} columns, found {books.shape[1]}"
+        )
     users = pd.read_csv(
         DATA_DIR / "BX-Users.csv",
         sep=";",
         encoding="latin-1",
         on_bad_lines="skip",
     )
+    if users.shape[1] != len(USER_COLUMNS):
+        raise ValueError(
+            f"BX-Users.csv must have {len(USER_COLUMNS)} columns, found {users.shape[1]}"
+        )
     ratings = pd.read_csv(
         DATA_DIR / "BX-Book-Ratings.csv",
         sep=";",
         encoding="latin-1",
         on_bad_lines="skip",
     )
+    if ratings.shape[1] != len(RATING_COLUMNS):
+        raise ValueError(
+            f"BX-Book-Ratings.csv must have {len(RATING_COLUMNS)} columns, found {ratings.shape[1]}"
+        )
 
-    books.columns = [
-        "ISBN",
-        "bookTitle",
-        "bookAuthor",
-        "yearOfPublication",
-        "publisher",
-        "imageUrlS",
-        "imageUrlM",
-        "imageUrlL",
-    ]
-    users.columns = ["userID", "location", "age"]
-    ratings.columns = ["userID", "ISBN", "bookRating"]
+    books.columns = BOOK_COLUMNS
+    users.columns = USER_COLUMNS
+    ratings.columns = RATING_COLUMNS
+
+    assert_columns(books, BOOK_COLUMNS, "BX_Books.csv")
+    assert_columns(users, USER_COLUMNS, "BX-Users.csv")
+    assert_columns(ratings, RATING_COLUMNS, "BX-Book-Ratings.csv")
 
     users["age"] = pd.to_numeric(users["age"], errors="coerce")
     books["yearOfPublication"] = pd.to_numeric(
@@ -65,6 +124,7 @@ def load_data():
         .merge(books, on="ISBN", how="inner")
     )
 
+    assert_non_empty(merged, "merged book recommendation data")
     return merged
 
 
@@ -77,11 +137,15 @@ def prepare_training_data(data, min_user_ratings, min_book_ratings):
     popular_books = book_counts[book_counts >= min_book_ratings].index
     filtered = filtered[filtered["bookTitle"].isin(popular_books)].copy()
 
+    assert_non_empty(filtered, "filtered training data")
+
     book_user_matrix = filtered.pivot_table(
         index="bookTitle",
         columns="userID",
         values="bookRating",
     ).fillna(0)
+    if book_user_matrix.empty:
+        raise ValueError("book-user matrix is empty after filtering")
     sparse_matrix = csr_matrix(book_user_matrix.values)
 
     book_info = (
@@ -122,7 +186,9 @@ def save_artifact(artifact, artifact_path=ARTIFACT_PATH):
 
 
 def load_artifact(artifact_path=ARTIFACT_PATH):
-    return joblib.load(artifact_path)
+    artifact = joblib.load(artifact_path)
+    validate_artifact(artifact)
+    return artifact
 
 
 def recommend_similar_books(book_title, artifact, n=10):

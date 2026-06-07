@@ -1,4 +1,8 @@
+import sys
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 import streamlit as st
 import pandas as pd
@@ -6,12 +10,10 @@ import joblib
 import shap
 import matplotlib.pyplot as plt
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
-model_path = ROOT_DIR / 'artifacts' / 'models' / 'model.pkl'
-processor_path = ROOT_DIR / 'artifacts' / 'models' / 'preprocessor.pkl'
+from src.config import MODEL_PATH, PREPROCESSOR_PATH
 
-model = joblib.load(model_path)
-preprocessor = joblib.load(processor_path)
+model = joblib.load(MODEL_PATH)
+preprocessor = joblib.load(PREPROCESSOR_PATH)
 
 st.title('Customer Churn Predictor')
 st.markdown(

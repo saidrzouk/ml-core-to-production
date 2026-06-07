@@ -1,0 +1,22 @@
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+*.pyo
+.env
+.venv/
+venv/
+env/
+
+# Streamlit local state
+.streamlit/
+
+# Logs and models
+*.log
+*.pkl
+*.keras
+*.h5
+models/
+
+# OS / editor
+.DS_Store
+Thumbs.db

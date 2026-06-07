@@ -3,6 +3,14 @@ __pycache__/
 .streamlit/
 *.pyc
 *.pyo
+.env
+.venv/
+venv/
+env/
 
 # Large raw data files stay local
 data/*.csv
+
+# Trained artifacts and outputs
+artifacts/
+*.joblib
