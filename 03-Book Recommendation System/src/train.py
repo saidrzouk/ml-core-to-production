@@ -1,4 +1,4 @@
-from recommender import (
+from src.recommender import (
     ARTIFACT_PATH,
     build_model,
     load_data,

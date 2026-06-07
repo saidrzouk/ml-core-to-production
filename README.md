@@ -33,7 +33,7 @@ streamlit run src/app.py
 ## Common Commands
 
 ```powershell
-python scripts/train.py
+python src/train.py
 streamlit run src/app.py
 ```
 

@@ -7,6 +7,7 @@ Collaborative filtering recommender trained on the Book-Crossing dataset and ser
 - `src/app.py` - Streamlit app.
 - `src/recommender.py` - data loading, filtering, model training helpers, and recommendation logic.
 - `src/train.py` - reproducible training entry point.
+- `src/__init__.py` - package marker.
 - `data/` - local Book-Crossing CSV files.
 - `artifacts/` - saved recommendation artifact.
 - `notebooks/` - exploratory notebook.

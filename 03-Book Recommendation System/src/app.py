@@ -1,6 +1,6 @@
 import streamlit as st
 
-from recommender import ARTIFACT_PATH, load_artifact, recommend_similar_books
+from src.recommender import ARTIFACT_PATH, load_artifact, recommend_similar_books
 
 
 def format_year(value):
@@ -57,7 +57,7 @@ st.title("Book Recommendation System")
 
 if not ARTIFACT_PATH.exists():
     st.error(
-        "No trained artifact found yet. Run `python scripts/train.py` from the project folder first."
+        "No trained artifact found yet. Run `python src/train.py` from the project folder first."
     )
     st.stop()
 
