@@ -38,7 +38,7 @@ streamlit run src/app.py
 ```
 
 ```powershell
-python scripts/train_models.py
+python src/train.py
 streamlit run src/app.py
 ```
 
@@ -47,5 +47,4 @@ streamlit run src/app.py
 - Run commands from the matching project folder.
 - Generated artifacts stay inside the project that created them.
 - Each project manages its own dependencies through `requirements.txt`.
-- `.env` files and other local environment files are ignored by `.gitignore`.
-- Several projects now support environment-variable based path overrides through `src/config.py`.
+
